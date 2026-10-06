@@ -1,0 +1,39 @@
+{
+  "name": "printcraft-pdf",
+  "version": "1.0.1",
+  "description": "A precise desktop PDF printing utility with visual layout controls.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.cjs && node --check src/app.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^6.2.108"
+  },
+  "devDependencies": {
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.printcraft.pdf",
+    "productName": "PrintCraft PDF",
+    "publish": [],
+    "files": [
+      "main.js",
+      "preload.cjs",
+      "index.html",
+      "src/**/*",
+      "node_modules/pdfjs-dist/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

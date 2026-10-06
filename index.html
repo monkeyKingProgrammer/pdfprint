@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; img-src 'self' data: blob:;" />
+    <title>PrintCraft PDF</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M9 3h11l5 5v8h-4v-5H9v5H5V7a4 4 0 0 1 4-4Zm0 17h14v9H9v-9Z"/><circle cx="23" cy="8" r="1.5"/></svg>
+        </div>
+        <div><strong>PrintCraft</strong><span>PDF print studio</span></div>
+      </div>
+      <button class="btn btn-primary" id="openFileBtn">
+        <span class="btn-icon">＋</span> Open PDF
+      </button>
+    </header>
+
+    <main class="app-shell">
+      <aside class="settings-panel">
+        <div class="file-card" id="fileCard">
+          <div class="file-icon">PDF</div>
+          <div class="file-meta">
+            <strong id="fileName">No document open</strong>
+            <span id="fileDetails">Choose a PDF to begin</span>
+          </div>
+          <button class="icon-btn" id="replaceFileBtn" title="Choose another PDF">↗</button>
+        </div>
+
+        <section class="control-section">
+          <h2>Printer</h2>
+          <label class="field full">
+            <span>Printer</span>
+            <select id="printerSelect"><option value="">System print dialog</option></select>
+          </label>
+          <div class="field-grid two">
+            <label class="field"><span>Copies</span><input id="copies" type="number" min="1" max="999" value="1" /></label>
+            <label class="check-field"><input id="collate" type="checkbox" checked /><span>Collate copies</span></label>
+          </div>
+          <div class="field-grid two">
+            <label class="field"><span>Color</span><select id="colorMode"><option value="color">Color</option><option value="mono">Grayscale</option></select></label>
+            <label class="field"><span>Two-sided</span><select id="duplex"><option value="simplex">Off</option><option value="longEdge">Flip long edge</option><option value="shortEdge">Flip short edge</option></select></label>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <h2>Pages</h2>
+          <div class="segmented" role="group" aria-label="Page selection">
+            <button class="segment active" data-page-mode="all">All</button>
+            <button class="segment" data-page-mode="current">Current</button>
+            <button class="segment" data-page-mode="custom">Range</button>
+          </div>
+          <label class="field full range-field hidden" id="rangeField"><span>Page range <small>e.g. 1-3, 6, 9-11</small></span><input id="pageRange" type="text" placeholder="1-3, 6" /></label>
+        </section>
+
+        <section class="control-section">
+          <h2>Paper & orientation</h2>
+          <div class="field-grid two">
+            <label class="field"><span>Paper size</span><select id="paperSize"><option value="a4">A4</option><option value="letter">US Letter</option><option value="legal">US Legal</option><option value="a3">A3</option><option value="a5">A5</option></select></label>
+            <label class="field"><span>Orientation</span><select id="orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+          </div>
+          <label class="field full"><span>Rotate PDF page</span><select id="rotation"><option value="0">No rotation</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select></label>
+        </section>
+
+        <section class="control-section">
+          <h2>Size</h2>
+          <div class="segmented" role="group" aria-label="Page sizing">
+            <button class="segment active" data-scale-mode="fit">Fit</button>
+            <button class="segment" data-scale-mode="actual">Actual</button>
+            <button class="segment" data-scale-mode="fill">Fill</button>
+            <button class="segment" data-scale-mode="custom">Custom</button>
+          </div>
+          <label class="field full custom-scale hidden" id="customScaleField"><span>Custom scale</span><div class="suffix-input"><input id="customScale" type="number" min="10" max="500" value="100" /><span>%</span></div></label>
+          <label class="check-field compact"><input id="shrinkOversize" type="checkbox" checked /><span>Only shrink oversized pages</span></label>
+        </section>
+
+        <section class="control-section">
+          <div class="section-heading"><h2>Margins</h2><button class="text-btn" id="resetMargins">Reset</button></div>
+          <div class="margin-diagram">
+            <label class="margin-input top"><span>Top</span><input id="marginTop" type="number" min="0" max="100" step="1" value="10" /></label>
+            <label class="margin-input left"><span>Left</span><input id="marginLeft" type="number" min="0" max="100" step="1" value="10" /></label>
+            <div class="page-glyph"><div></div></div>
+            <label class="margin-input right"><span>Right</span><input id="marginRight" type="number" min="0" max="100" step="1" value="10" /></label>
+            <label class="margin-input bottom"><span>Bottom</span><input id="marginBottom" type="number" min="0" max="100" step="1" value="10" /></label>
+          </div>
+          <div class="unit-note">All margins are in millimetres</div>
+        </section>
+
+        <section class="control-section">
+          <h2>Position</h2>
+          <div class="field-grid two">
+            <label class="field"><span>Horizontal</span><select id="alignX"><option value="center">Centre</option><option value="left">Left</option><option value="right">Right</option></select></label>
+            <label class="field"><span>Vertical</span><select id="alignY"><option value="center">Centre</option><option value="top">Top</option><option value="bottom">Bottom</option></select></label>
+          </div>
+          <button class="btn btn-soft full" id="centerBtn">◎ Centre on page</button>
+          <label class="check-field compact"><input id="showGuides" type="checkbox" checked /><span>Show printable-area guides in preview</span></label>
+        </section>
+
+        <section class="control-section">
+          <h2>Output quality</h2>
+          <label class="field full"><span>Raster quality</span><select id="quality"><option value="96">Draft · 96 DPI</option><option value="150" selected>Standard · 150 DPI</option><option value="220">High · 220 DPI</option><option value="300">Maximum · 300 DPI</option></select></label>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <div class="workspace-toolbar">
+          <div>
+            <strong>Print preview</strong>
+            <span id="previewStatus">Open a PDF to preview it</span>
+          </div>
+          <div class="zoom-controls">
+            <button class="icon-btn" id="zoomOut" title="Zoom out">−</button>
+            <span id="zoomLabel">100%</span>
+            <button class="icon-btn" id="zoomIn" title="Zoom in">＋</button>
+          </div>
+        </div>
+
+        <div class="preview-viewport" id="previewViewport">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-illustration">
+              <div class="paper-back"></div><div class="paper-front"><span>PDF</span><i></i><i></i><i></i></div>
+            </div>
+            <h1>Ready when you are</h1>
+            <p>Open a PDF, fine-tune the layout, and see exactly how it will sit on the page.</p>
+            <button class="btn btn-primary" id="emptyOpenBtn">Choose a PDF</button>
+          </div>
+          <div class="preview-stage hidden" id="previewStage">
+            <canvas id="previewCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="page-navigator disabled" id="pageNavigator">
+          <button class="icon-btn" id="prevPage">‹</button>
+          <span>Page <input id="currentPage" type="number" min="1" value="1" /> of <strong id="pageCount">—</strong></span>
+          <button class="icon-btn" id="nextPage">›</button>
+        </div>
+
+        <footer class="action-bar">
+          <div class="summary"><strong id="summaryTitle">No document selected</strong><span id="summaryDetail">Open a PDF to configure printing</span></div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="dialogPrintBtn" disabled>Print with dialog</button>
+            <button class="btn btn-primary" id="quickPrintBtn" disabled>Print now <span class="arrow">→</span></button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <div id="printRoot" aria-hidden="true"></div>
+    <div class="toast" id="toast" role="status"></div>
+    <div class="busy-overlay hidden" id="busyOverlay"><div class="spinner"></div><strong id="busyTitle">Preparing pages…</strong><span id="busyDetail">Rendering page 1</span></div>
+
+    <script src="src/polyfills.js"></script>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

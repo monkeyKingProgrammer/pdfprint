@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Generated application builds
+dist/
+
+# Local PDF documents used for testing
+*.pdf
+
+# Logs and OS/editor metadata
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
